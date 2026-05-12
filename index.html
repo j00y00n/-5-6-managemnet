@@ -14,7 +14,9 @@
     .date-input { width: 95%; margin-bottom: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-size: 11px; }
     .memo-input { width: 95%; border: 1px solid #eee; border-radius: 3px; height: 35px; font-size: 11px; resize: none; }
     .status-btn { width: 100%; padding: 5px 0; cursor: pointer; border: none; border-radius: 3px; font-size: 10px; font-weight: bold; margin-top: 3px; }
-    .stats-badge { font-size: 10px; padding: 2px; border-radius: 3px; margin-bottom: 2px; font-weight: bold; }
+    .stats-badge { font-size: 10px; padding: 2px; border-radius: 3px; margin-bottom: 2px; font-weight: bold; cursor: default; }
+    .editable-badge { cursor: pointer; border: 1px solid transparent; transition: 0.2s; }
+    .editable-badge:hover { border: 1px solid white; opacity: 0.8; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
     .state-0 { background-color: #e9ecef; color: #495057; }
     .state-1 { background-color: #007bff; color: white; }
     .state-2 { background-color: #dc3545; color: white; }
@@ -59,45 +61,29 @@
 
 <script>
   // ================= [설정 구역] =================
-  // 1. 배포할 때는 true로 바꾸세요.
-  const isReadOnly = true; 
-
-  // 2. 관리자 모드에서 saveDB 실행 시 콘솔(F12)에 찍히는 데이터를 여기에 붙여넣으세요.
-  const dataSnapshot = [{"name":"수진","days":"월, 수","time":"4시","sessions":[2,1,0,0,0,0,2,0,0],"dates":["05.04","05.06","05.11","05.13","05.18","05.20","05.25","05.27",""],"memos":["5월 19일(화) 5시\n보강 예정","4시","4시","4시","4시","4시","5월 26일(화) 5시\n보강 예정","4시",""],"longMemo":"5/6 기준 수정 완료","makeupArrows":[{"from":"05.04","to":"05.19"},{"from":"05.25","to":"05.26"}]},{"name":"가영","days":"월,수","time":"4시","sessions":[2,1,2,0,0,0,2,0,0],"dates":["05.04","05.06","05.11","05.13","05.18","05.20","05.25","05.27",""],"memos":["5월 11일(월)\n80분 수업 예정","4시","보강 예정\n13일에 확정 예정","4시(80분)\n5월 4일분 보강","4시","4시","4시","4시",""],"longMemo":"5/4 기준 이상 무","makeupArrows":[{"from":"05.04","to":"05.13"}],"makeupX":[]},{"name":"지은","days":"월, 수","time":"4시","sessions":[2,1,0,0,0,0,2,0,0],"dates":["05.04","05.06","05.11","05.13","05.18","05.20","05.25","05.27",""],"memos":["5월 19일(화)4시반\n보강 예정","4시","4시","4시","4시","4시","4시","4시",""],"longMemo":"5/4 기준 이상 무","makeupArrows":[{"from":"05.04","to":"05.19"}],"makeupX":[]},{"name":"혜승","days":"월,금","time":"4시","sessions":[2,2,1,0,0,0,0,2,0],"dates":["05.01","05.04","05.08","05.11","05.15","05.18","05.22","05.25","05.29"],"memos":["5월 7일 (목) 5시\n보강 예정","5월 12일 (화) 5시\n보강 예정","4시","4시","4시","4시","4시","보강 x","4시"],"longMemo":"이번 달 시수 9회 (25일)\n\n5/4 기준 수정 완료","makeupArrows":[{"from":"05.04","to":"05.12"},{"from":"05.01","to":"05.07"}],"makeupX":["05.25"]},{"name":"서준","days":"화,수","time":"5시,4시","sessions":[2,1,0,0,0,0,0,0,0],"dates":["05.05","05.06","05.12","05.13","05.19","05.20","05.26","05.27",""],"memos":["5월 7일(목) 5시\n보강 예정","4시","5시","4시","5시","4시","5시","4시",""],"longMemo":".","makeupArrows":[{"from":"05.05","to":"05.07"}],"makeupX":[]},{"name":"도훈","days":"수,금","time":"4시반","sessions":[2,1,1,0,0,0,0,0,0],"dates":["05.01","05.06","05.08","05.13","05.15","05.20","05.22","05.27","05.29"],"memos":["13일 20분 보강\n15일 20분 보강 진행","4시반","4시반","4시반","4시반","4시반","4시반","4시반","4시반"],"longMemo":"이번 달 시수 9회\n4월 29일 수업 보강 x\n---\n5/4 기준 이상 무\n보강 관리 정정 (결강:1,보강:1)","makeupArrows":[{"from":"05.01","to":"05.13"},{"from":"05.01","to":"05.15"}],"makeupX":[]},{"name":"아영","days":"수,금","time":"3시반, 3시20","sessions":[2,1,1,0,0,0,0,0,0],"dates":["05.01","05.06","05.08","05.13","05.15","05.20","05.22","05.27","05.29"],"memos":["3시20\n보강 x","3시반","3시20","3시반","3시20","3시반","3시20","3시반","3시20"],"longMemo":"이번 달 시수 9회"},{"name":"형민","days":"수,금","time":"5시, 4시반","sessions":[2,1,1,0,0,0,0,0,0],"dates":["05.01","05.06","05.08","05.13","05.15","05.20","05.22","05.27","05.29"],"memos":["4시반","5시","4시반","5시","4시반","5시","4시반","5시","4시반"],"longMemo":"이번 달 시수 9회\n---\n5/4 기준 이상 무"},{"name":"성은","days":"금,금","time":"5시(1회), 5시(2회)","sessions":[2,1,1,2,2,0,0,0,0],"dates":["05.01","05.08","05.08","05.15","05.15","05.22","05.22","05.29","05.29"],"memos":["보강 x","5시(1회)","5시(2회)","5월 7일(목) 5시40 보강 예정","5월21일(목) 5시40 보강 예정","5시(1회)","5시(2회)","5시(1회)","5시(2회)"],"longMemo":"5/4 기준 이상 무","makeupX":["05.01"],"makeupArrows":[{"from":"05.15","to":"05.07"},{"from":"05.15","to":"05.21"}]},{"name":"연송","days":"화,금","time":"5시","sessions":[2,2,1,0,0,0,0,0,0],"dates":["05.01","05.05","05.08","05.12","05.15","05.19","05.22","05.26","05.29"],"memos":["5시","5시","5시","5시","5시","5시","5시","5시","5시"],"longMemo":"이번 달 시수 9회"}];
+  const isReadOnly = false; 
+  const dataSnapshot = null; 
   // ==============================================
 
   const may2026 = { '일': [3, 10, 17, 24, 31], '월': [4, 11, 18, 25], '화': [5, 12, 19, 26], '수': [6, 13, 20, 27], '목': [7, 14, 21, 28], '금': [1, 8, 15, 22, 29], '토': [2, 9, 16, 23, 30] };
   
   let db;
 
-// 데이터 로드
   const localData = localStorage.getItem('classManagerDB');
-
   if (isReadOnly) {
-    // 1. 배포 모드: 무조건 코드에 박힌 dataSnapshot만 사용 (로컬 저장소 무시)
-    db = dataSnapshot;
+    db = dataSnapshot || [];
   } else {
-    // 2. 관리자 모드: 내 컴퓨터 저장소(localData)를 먼저 확인하고, 없으면 기본 배열 생성
     db = JSON.parse(localData) || Array.from({ length: 10 }, (_, i) => ({
-      name: `학생${i + 1}`,
-      days: '',
-      sessions: Array(9).fill(0),
-      dates: Array(9).fill(''),
-      memos: Array(9).fill(''),
-      longMemo: '',
-      makeupArrows: [],
-      makeupX: []
+      name: `학생${i+1}`, days: '', sessions: Array(9).fill(0),
+      dates: Array(9).fill(''), memos: Array(9).fill(''), longMemo: '', makeupArrows: [], makeupX: [], manualMakeupCount: null, manualMissCount: null
     }));
   }
 
   function saveDB() {
     if (isReadOnly) return;
     localStorage.setItem('classManagerDB', JSON.stringify(db));
-    
-    // 배포용 스냅샷 생성을 위해 콘솔에 출력
     console.log("▼ 아래 데이터를 복사해서 dataSnapshot에 붙여넣으세요");
     console.log(JSON.stringify(db));
-    
     renderDashboard();
   }
 
@@ -108,7 +94,7 @@
     tbody.innerHTML = '';
 
     db.forEach((student, i) => {
-      const dis = isReadOnly ? 'disabled' : ''; // 배포 모드 시 입력 차단
+      const dis = isReadOnly ? 'disabled' : '';
       const tr = document.createElement('tr');
       let html = `<td class="config-cell">
         <input type="text" class="name-input" ${dis} value="${student.name}" oninput="db[${i}].name=this.value; saveDB();">
@@ -121,12 +107,20 @@
           <button class="status-btn state-${student.sessions[j]}" ${dis} onclick="toggleState(${i}, ${j})">${student.sessions[j]==0?'대기':student.sessions[j]==1?'완료':'결강'}</button>
         </td>`;
       }
-      const miss = student.sessions.filter(s => s === 2).length;
-      const totalMakeup = (student.makeupArrows || []).length + (student.makeupX || []).length;
-      const isComplete = (miss > 0 && miss === totalMakeup);
+      
+      // 결강 수 계산 (수동 우선)
+      const calcMiss = student.sessions.filter(s => s === 2).length;
+      const displayMiss = (student.manualMissCount !== undefined && student.manualMissCount !== null) ? student.manualMissCount : calcMiss;
+
+      // 보강 수 계산 (수동 우선)
+      const calcMakeup = (student.makeupArrows || []).length + (student.makeupX || []).length;
+      const displayMakeup = (student.manualMakeupCount !== undefined && student.manualMakeupCount !== null) ? student.manualMakeupCount : calcMakeup;
+      
+      const isComplete = (parseFloat(displayMiss) > 0 && parseFloat(displayMiss) <= parseFloat(displayMakeup));
+
       html += `<td style="position:relative;">
-        <div class="stats-badge state-2">결강: ${miss}</div>
-        <div class="stats-badge state-1">보강: ${totalMakeup}</div>
+        <div class="stats-badge state-2 editable-badge" onclick="editCount(${i}, 'miss')" title="클릭하여 수동 수정">결강: ${displayMiss}</div>
+        <div class="stats-badge state-1 editable-badge" onclick="editCount(${i}, 'makeup')" title="클릭하여 수동 수정">보강: ${displayMakeup}</div>
         <button class="status-btn state-0" style="background:#444; color:white;" onclick="openMakeupModal(${i})">보강 설정</button>
         ${isComplete ? '<span class="complete-check">✅</span>' : ''}
       </td>
@@ -135,6 +129,27 @@
       tbody.appendChild(tr);
     });
     renderDashboard();
+  }
+
+  // 횟수 수동 수정 통합 함수 (type: 'miss' 또는 'makeup')
+  function editCount(idx, type) {
+    if(isReadOnly) return;
+    const isMiss = type === 'miss';
+    const field = isMiss ? 'manualMissCount' : 'manualMakeupCount';
+    const label = isMiss ? '결강' : '보강';
+    
+    const calcVal = isMiss ? db[idx].sessions.filter(s => s === 2).length : (db[idx].makeupArrows.length + db[idx].makeupX.length);
+    const current = db[idx][field] !== null ? db[idx][field] : calcVal;
+    
+    const newCount = prompt(`[${db[idx].name}] ${label} 횟수를 직접 입력하세요.\n(자동 계산으로 되돌리려면 취소를 누르거나 빈칸 입력)`, current);
+    
+    if (newCount === null || newCount.trim() === "") {
+        db[idx][field] = null;
+    } else {
+        db[idx][field] = parseFloat(newCount);
+    }
+    saveDB();
+    init();
   }
 
   function toggleState(sIdx, sessIdx) {
@@ -178,7 +193,6 @@
   function openMakeupModal(idx) {
     const modal = document.getElementById('commonModal');
     const inner = document.getElementById('modalInner');
-    const dis = isReadOnly ? 'disabled' : '';
     inner.innerHTML = `
       <h3 style="margin:0 0 10px 0;">${db[idx].name} 보강 설정</h3>
       <p style="font-size:11px; color:#666; margin-bottom:10px;">${isReadOnly ? '조회 전용 모드입니다.' : '• 연결: 드래그 / • 취소: 클릭(X)'}</p>
@@ -194,7 +208,13 @@
   }
 
   function closeModal() { document.getElementById('commonModal').style.display = 'none'; init(); }
-  function resetMakeup(idx) { db[idx].makeupArrows = []; db[idx].makeupX = []; saveDB(); renderMakeupGrid(idx); drawArrows(idx); }
+  function resetMakeup(idx) { 
+    db[idx].makeupArrows = []; 
+    db[idx].makeupX = []; 
+    db[idx].manualMakeupCount = null; 
+    db[idx].manualMissCount = null; 
+    saveDB(); renderMakeupGrid(idx); drawArrows(idx); 
+  }
 
   function renderMakeupGrid(sIdx) {
     const grid = document.getElementById('makeup-grid');
